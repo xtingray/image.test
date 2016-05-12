@@ -20,7 +20,6 @@ class MainWindow : public QMainWindow
 
     private:
         void importBitmap(const QString &path);
-        void loadRawData(const QString &path, const QByteArray &data);
 
         QMenu *fileMenu;
         QAction *loadAction;
