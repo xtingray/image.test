@@ -2,11 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QMenuBar>
 #include <QMenu>
 #include <QAction>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+
+#include "nodemanager.h"
 
 class MainWindow : public QMainWindow
 {
@@ -17,15 +18,19 @@ class MainWindow : public QMainWindow
 
     private slots:
         void loadImage();
+        void resetSpace();
 
     private:
         void importBitmap(const QString &path);
 
         QMenu *fileMenu;
         QAction *loadAction;
+        QAction *resetAction;
         QAction *exitAction;
         QGraphicsScene *scene;
         QGraphicsView *view;
+        QGraphicsPixmapItem *item;
+        NodeManager *manager;
 };
 
 #endif

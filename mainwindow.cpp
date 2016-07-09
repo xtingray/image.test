@@ -1,8 +1,7 @@
 #include "mainwindow.h"
 
+#include <QMenuBar>
 #include <QFileDialog>
-#include <QFile>
-#include <QByteArray>
 #include <QPixmap>
 #include <QGraphicsPixmapItem>
 
@@ -13,6 +12,11 @@ MainWindow::MainWindow()
     loadAction->setStatusTip(tr("Load image"));
     connect(loadAction, SIGNAL(triggered()), this, SLOT(loadImage()));
 
+    resetAction = new QAction(tr("&Reset workspace"), this);
+    resetAction->setShortcuts(QKeySequence::Delete);
+    resetAction->setStatusTip(tr("Reset workspace"));
+    connect(resetAction, SIGNAL(triggered()), this, SLOT(resetSpace()));
+
     exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
     exitAction->setStatusTip(tr("Exit the application"));
@@ -20,6 +24,7 @@ MainWindow::MainWindow()
 
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(loadAction);
+    fileMenu->addAction(resetAction);
     fileMenu->addAction(exitAction);
 
     scene = new QGraphicsScene();
@@ -47,8 +52,20 @@ void MainWindow::loadImage()
 void MainWindow::importBitmap(const QString &path)
 {
     QPixmap pixmap(path);
-    QGraphicsPixmapItem *item = new QGraphicsPixmapItem;
+    item = new QGraphicsPixmapItem;
     item->setPixmap(pixmap);
+    item->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    item->setFlag(QGraphicsItem::ItemIsMovable, false);
     scene->clear();
     scene->addItem(item);
+    item->setSelected(true);
+
+    manager = new NodeManager(item, scene, 10);
+    manager->syncNodes();
+}
+
+void MainWindow::resetSpace()
+{
+    scene->removeItem(item);
+    manager->clear();
 }
