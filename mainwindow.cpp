@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QPixmap>
 #include <QGraphicsPixmapItem>
+#include <QDockWidget>
 
 MainWindow::MainWindow()
 {
@@ -32,7 +33,20 @@ MainWindow::MainWindow()
 
     setCentralWidget(view);
 
+    panel = new Controls(this);
+
+    QDockWidget *dock = new QDockWidget(tr("Controls"), this);
+    dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    dock->setWidget(panel);
+    addDockWidget(Qt::RightDockWidgetArea, dock);
+
+    connect(panel, SIGNAL(rotationChanged(int)), this, SLOT(rotate(int)));
+    connect(panel, SIGNAL(scaleChanged(int)), this, SLOT(scale(int)));
+
     showFullScreen();
+    
+    rotationAngle = 0;
+    scaleFactor = 1;
 }
 
 void MainWindow::loadImage()
@@ -51,6 +65,10 @@ void MainWindow::loadImage()
 
 void MainWindow::importBitmap(const QString &path)
 {
+    panel->resetSliders();
+    rotationAngle = 0;
+    scaleFactor = 1;
+
     QPixmap pixmap(path);
     item = new QGraphicsPixmapItem;
     item->setPixmap(pixmap);
@@ -68,4 +86,36 @@ void MainWindow::resetSpace()
 {
     scene->removeItem(item);
     manager->clear();
+}
+
+void MainWindow::rotate(int angle)
+{
+    if (item) {
+        QPointF point = item->boundingRect().center();
+        QTransform t;
+        t.translate(point.x(), point.y());
+        t.rotate(angle);
+        t.scale(scaleFactor, scaleFactor);
+        t.translate(-point.x(), -point.y());
+        item->setTransform(t);
+        rotationAngle = angle;
+
+        manager->syncNodes();
+    }
+}
+
+void MainWindow::scale(int percent)
+{
+    if (item) {
+        QPointF point = item->boundingRect().center();
+        QTransform t;
+        t.translate(point.x(), point.y());
+        t.rotate(rotationAngle);
+        t.scale(percent, percent);
+        t.translate(-point.x(), -point.y());
+        item->setTransform(t);
+        scaleFactor = percent;
+
+        manager->syncNodes();
+    }
 }

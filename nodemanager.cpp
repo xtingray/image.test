@@ -12,7 +12,9 @@ struct NodeManager::Private
 
     bool press;
     bool proportional;
-    double rotation;
+    qreal rotation;
+    qreal scaleX;
+    qreal scaleY;
 };
 
 NodeManager::NodeManager(QGraphicsItem * parent, QGraphicsScene  *scene, int zValue): k(new Private)
@@ -145,20 +147,26 @@ QPointF NodeManager::anchor() const
 void NodeManager::scale(float sx, float sy)
 {
     QTransform transform;
-    transform.translate(k->anchor.x(), k->anchor.y());
+    QPointF point = k->parent->boundingRect().center();
+    transform.translate(point.x(), point.y());
+    transform.rotate(k->rotation);
     transform.scale(sx, sy);
-    transform.translate(-k->anchor.x(), -k->anchor.y());
-    k->parent->setTransform(transform, true);
+    transform.translate(-point.x(), -point.y());
+    k->parent->setTransform(transform);
 
     syncNodesFromParent();
+    k->scaleX = sx;
+    k->scaleY = sy;
 }
 
 void NodeManager::rotate(double angle)
 {
-    QTransform transform = k->parent->transform();
-    transform.translate(k->anchor.x(), k->anchor.y());
-    transform.rotate(k->rotation - angle);
-    transform.translate(-k->anchor.x(), -k->anchor.y());
+    QTransform transform;
+    QPointF point = k->parent->boundingRect().center();
+    transform.translate(point.x(), point.y());
+    transform.rotate(angle);
+    transform.scale(k->scaleX, k->scaleY);
+    transform.translate(-point.x(), -point.y());
     k->parent->setTransform(transform);
 
     syncNodesFromParent();

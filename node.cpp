@@ -211,7 +211,7 @@ void Node::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
                        QLineF line(p2, p1);
                        QLineF lineRef(p2, pRef);
-                       double angle = line.angle() - lineRef.angle();
+                       double angle = lineRef.angle() - line.angle();
                        k->manager->rotate(angle);
                    }
         }

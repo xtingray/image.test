@@ -8,6 +8,7 @@
 #include <QGraphicsView>
 
 #include "nodemanager.h"
+#include "controls.h"
 
 class MainWindow : public QMainWindow
 {
@@ -19,6 +20,8 @@ class MainWindow : public QMainWindow
     private slots:
         void loadImage();
         void resetSpace();
+        void rotate(int angle);
+        void scale(int percent);
 
     private:
         void importBitmap(const QString &path);
@@ -27,10 +30,15 @@ class MainWindow : public QMainWindow
         QAction *loadAction;
         QAction *resetAction;
         QAction *exitAction;
+
+        Controls *panel;
+
         QGraphicsScene *scene;
         QGraphicsView *view;
         QGraphicsPixmapItem *item;
         NodeManager *manager;
+        qreal scaleFactor;
+        qreal rotationAngle;
 };
 
 #endif
